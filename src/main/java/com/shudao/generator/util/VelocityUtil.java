@@ -1,13 +1,11 @@
 package com.shudao.generator.util;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 
 import com.shudao.generator.model.CodeModel;
 import com.shudao.generator.model.ColumnModel;
@@ -23,7 +21,7 @@ public class VelocityUtil {
 
 	private static VelocityContext vc;
 
-	private static VelocityEngine ve;
+	private static Properties props;
 
 	/**
 	 * 获取单例的VelocityContext
@@ -31,12 +29,10 @@ public class VelocityUtil {
 	 * @param code
 	 * @param db
 	 * @return
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws Exception 
 	 */
 	public synchronized static VelocityContext getVelocityContextInstance(
-			CodeModel code, DbModel db) throws ClassNotFoundException,
-			SQLException {
+			CodeModel code, DbModel db) throws Exception {
 		try {
 			if (vc == null) {
 				vc = new VelocityContext();
@@ -67,39 +63,34 @@ public class VelocityUtil {
 		} catch (Exception e) {
 			System.out
 					.println("初始化VelocityContext失败:VelocityUtil.getVelocityContextInstance");
+			throw e;
 		}
-		return vc;
 	}
 
-	public synchronized static VelocityEngine getVelocityEngineInstance(
-			CodeModel cm) {
+	public synchronized static Properties getVelocityPropertiesInstance(
+			CodeModel cm) throws Exception {
 		try {
-			if (ve == null) {
-				ve = new VelocityEngine();
-				Properties properties = new Properties();
-				properties.setProperty("resource.loader", "file");
-				properties.setProperty("file.resource.loader.description",
+			if (props == null) {
+				props = new Properties();
+				props.setProperty("resource.loader", "file");
+				props.setProperty("file.resource.loader.description",
 						"Velocity File Resource Loader");
-				properties.setProperty("file.resource.loader.path",
-						cm.getFullTemplatePath());
-				properties.setProperty("file.resource.loader.cache", "true");
-				properties.setProperty(
+				props.setProperty("file.resource.loader.cache", "true");
+				props.setProperty(
 						"file.resource.loader.modificationCheckInterval", "30");
-				properties.setProperty("runtime.log.logsystem.class",
+				props.setProperty("runtime.log.logsystem.class",
 						"org.apache.velocity.runtime.log.Log4JLogChute");
-				properties.setProperty("runtime.log.logsystem.log4j.logger",
+				props.setProperty("runtime.log.logsystem.log4j.logger",
 						"org.apache.velocity");
-				properties.setProperty("directive.set.null.allowed", "true");
-				ve.init(properties);
-				return ve;
+				props.setProperty("directive.set.null.allowed", "true");
+				return props;
 			}
-			return ve;
+			return props;
 		} catch (Exception e) {
 			System.out
-					.println("初始化VelocityEngine失败:VelocityUtil.getVelocityEngineInstance");
-			e.printStackTrace();
+					.println("初始化Properties失败:VelocityUtil.getVelocityPropertiesInstance");
+			throw e;
 		}
-		return ve;
 	}
 
 }

@@ -62,22 +62,22 @@ public class ResourceUtil {
 	
 	//获取model文件的输出路径
 	private static String getModelPath(){
-		return codeBundle.getString("model_path");
+		return codeBundle.getString("model");
 	}
 	
 	//获取dao文件的输出路径
 	private static String getDaoPath(){
-		return codeBundle.getString("dao_path");
+		return codeBundle.getString("dao");
 	}
 	
 	//获取service文件的输出路径
 	private static String getServicePath(){
-		return codeBundle.getString("service_path");
+		return codeBundle.getString("service");
 	}
 	
 	//获取控制器文件的输出路径
 	private static String getControllerPath(){
-		return codeBundle.getString("controller_path");
+		return codeBundle.getString("controller");
 	}
 	
 	//获取用于代码注释的作者名
@@ -133,6 +133,15 @@ public class ResourceUtil {
 		return false;
 	}
 	
+	//获取读取的dbBundle
+	public static ResourceBundle getDbbundle() {
+		return dbBundle;
+	}
+	//获取读取的dbBundle
+	public static ResourceBundle getCodebundle() {
+		return codeBundle;
+	}
+
 	/***
 	 * 单例模式的Code实例
 	 * @return
