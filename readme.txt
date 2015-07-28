@@ -1,7 +1,10 @@
-table的命名规则：
+此代码生成器用于生成 SpringMVC + Spring + Mybatis 代码,项目使用的是mysql,如果为其他数据库,可以修改pom.xml和database.properties
 
+
+数据库：
+注释每个column,用于代码注释和view字段,如名称,地址,号码
 表名以tb_开头 单词之间用_隔开
-字段统一小写，单词之间用_隔开,
+字段统一小写，单词之间用_隔开
 
 使用时应注意的事项：
 database.properties 修改数据配置信息
