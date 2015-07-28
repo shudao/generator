@@ -1,4 +1,4 @@
-package com.shudao.generator.data;
+package com.shudao.generator.util;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,37 +15,37 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.shudao.generator.def.ResourceUtil;
+import com.shudao.generator.model.ColumnModel;
+import com.shudao.generator.model.DbModel;
 
-public class CreateBean {
-
-	private String url;
-	private String username;
-	private String password;
+public class DbUtil {
+	private static DbModel db;
 	
-	
-	public CreateBean(){}
-	
-	public CreateBean(String url,String username,String password){
-		this.url = url;
-		this.username = username;
-		this.password = password;
+	static
+	{
+		db = ResourceUtil.getDbInstance();
 	}
 	
-	static {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	public DbUtil(){}
 
-	public Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(url, username, password);
+	/***
+	 * 获取数据库连接
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	private static Connection getConnection() throws SQLException, ClassNotFoundException {
+		Class.forName(db.getDriverName());
+		return DriverManager.getConnection(db.getUrl(), db.getUserName(), db.getPassword());
 	}
-
 	
-	public List<String> getTables() throws SQLException {
+	/***
+	 * 获取指定数据库的表名s
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static List<String> getTables() throws SQLException, ClassNotFoundException {
 		Connection con = getConnection();
 		PreparedStatement ps = con.prepareStatement("show tables");
 		ResultSet rs = ps.executeQuery();
@@ -60,9 +60,14 @@ public class CreateBean {
 		return list;
 	}
 
-
-
-	public List<ColumnData> getColumnDatas(String tableName) throws SQLException {
+	/***
+	 *  根据表名获取列数据
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException 
+	 */
+	public static List<ColumnModel> getColumnDatas(String tableName) throws SQLException, ClassNotFoundException {
 		String SQLColumns = "select column_name ,"
 				+ "data_type,column_comment,0,0,"
 				+ "character_maximum_length,is_nullable nullable "
@@ -71,13 +76,12 @@ public class CreateBean {
 				+ tableName
 				+ "' "
 				+ "and table_schema =  '"
-				+ ResourceUtil.getDatabaseName() +"'";
+				+ db.getDatabaseName() +"'";
 
 		Connection con = getConnection();
 		PreparedStatement ps = con.prepareStatement(SQLColumns);
-		List<ColumnData> columnList = new ArrayList<ColumnData>();
+		List<ColumnModel> columnList = new ArrayList<ColumnModel>();
 		ResultSet rs = ps.executeQuery();
-		
 		while (rs.next()) {
 			String name = rs.getString(1).toLowerCase();
 			String type = rs.getString(2);
@@ -85,10 +89,10 @@ public class CreateBean {
 			String precision = rs.getString(4);
 			String scale = rs.getString(5);
 			String charmaxLength = rs.getString(6) == null ? "" : rs.getString(6);
-			String nullable = TableConvert.getNullAble(rs.getString(7));
+			String nullable = getNullAble(rs.getString(7));
 			type = getType(type, precision, scale);
 			
-			ColumnData cd = new ColumnData();
+			ColumnModel cd = new ColumnModel();
 			cd.setColumnName(name);
 			cd.setDataType(type);
 			cd.setColumnType(rs.getString(2));
@@ -110,9 +114,11 @@ public class CreateBean {
 		return columnList;
 	}
 
-	
-
-	private void formatFieldClassType(ColumnData columnt) {
+	/**
+	 * 为easyui转换数据格式
+	 * @param columnt
+	 */
+	public static void formatFieldClassType(ColumnModel columnt) {
 		String fieldType = columnt.getColumnType();
 		String scale = columnt.getScale();
 		if ("N".equals(columnt.getNullable())) {
@@ -145,7 +151,14 @@ public class CreateBean {
 		}
 	}
 
-	public String getType(String dataType, String precision, String scale) {
+	/**
+	 * 获取数据类型
+	 * @param dataType
+	 * @param precision
+	 * @param scale
+	 * @return
+	 */
+	public static String getType(String dataType, String precision, String scale) {
 		dataType = dataType.toLowerCase();
 		if (dataType.contains("char"))
 			dataType = "java.lang.String";
@@ -176,7 +189,7 @@ public class CreateBean {
 		return dataType;
 	}
 
-	public void getPackage(int type, String createPath, String content, String packageName, String className,
+	public static void getPackage(int type, String createPath, String content, String packageName, String className,
 			String extendsClassName, String[] importName) throws Exception {
 		if (packageName == null) {
 			packageName = "";
@@ -213,7 +226,12 @@ public class CreateBean {
 		createFile(createPath, "", sb.toString());
 	}
 
-	public String getTablesNameToClassName(String tableName) {
+	/***
+	 * 根据表名转换为类名
+	 * @param tableName
+	 * @return
+	 */
+	public static String getTablesNameToClassName(String tableName) {
 		String[] split = tableName.split("_");
 		if (split.length > 1) {
 			StringBuffer sb = new StringBuffer();
@@ -229,7 +247,14 @@ public class CreateBean {
 		return tempTables;
 	}
 
-	public void createFile(String path, String fileName, String str) throws IOException {
+	/***
+	 * 创建文件
+	 * @param path
+	 * @param fileName
+	 * @param str
+	 * @throws IOException
+	 */
+	public static void createFile(String path, String fileName, String str) throws IOException {
 		FileWriter writer = new FileWriter(new File(path + fileName));
 		writer.write(new String(str.getBytes("utf-8")));
 		writer.flush();
@@ -237,20 +262,18 @@ public class CreateBean {
 	}
 
 
-	public String getColumnSplit(List<ColumnData> columnList) throws SQLException {
+	public static String getColumnSplit(List<ColumnModel> columnList) throws SQLException {
 		StringBuffer commonColumns = new StringBuffer();
-		for (ColumnData data : columnList) {
+		for (ColumnModel data : columnList) {
 			commonColumns.append(data.getColumnName() + "|");
 		}
 		return commonColumns.delete(commonColumns.length() - 1, commonColumns.length()).toString();
 	}
 
 	/**
-	 * 将驼峰式命名的字符串转换为下划线大写方式。如果转换前的驼峰式命名的字符串为空，则返回空字符串。</br>
+	 * 将驼峰式命名的字符串转换为下划线大写方式。如果转换前的驼峰式命名的字符串为空，则返回空字符串。
 	 * 例如：HelloWorld->HELLO_WORLD
-	 * 
-	 * @param name
-	 *            转换前的驼峰式命名的字符串
+	 * @param name 转换前的驼峰式命名的字符串
 	 * @return 转换后下划线大写方式命名的字符串
 	 */
 	public static String underscoreName(String name) {
@@ -273,11 +296,9 @@ public class CreateBean {
 	}
 
 	/**
-	 * 将下划线大写方式命名的字符串转换为驼峰式。如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。</br>
+	 * 将下划线大写方式命名的字符串转换为驼峰式。如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。
 	 * 例如：HELLO_WORLD->HelloWorld
-	 * 
-	 * @param name
-	 *            转换前的下划线大写方式命名的字符串
+	 * @param name 转换前的下划线大写方式命名的字符串
 	 * @return 转换后的驼峰式命名的字符串
 	 */
 	public static String camelName(String name) {
@@ -309,5 +330,32 @@ public class CreateBean {
 		}
 		return result.toString();
 	}
+	/**
+	 * 判断数据库字段是否允许为空
+	 * @param nullable
+	 * @return
+	 */
+	public static String getNullAble(String nullable) {
+		if (("YES".equals(nullable)) || ("yes".equals(nullable))
+				|| ("y".equals(nullable)) || ("Y".equals(nullable))) {
+			return "Y";
+		}
+		if (("NO".equals(nullable)) || ("N".equals(nullable))
+				|| ("no".equals(nullable)) || ("n".equals(nullable))) {
+			return "N";
+		}
+		return null;
+	}
 
+	public static String getPkgFromColumnData(List<ColumnModel> columnDatas) {
+		StringBuffer sb = new StringBuffer();
+		for (ColumnModel column : columnDatas) {
+			String dataType = column.getDataType();
+			if (!dataType.contains(".lang.") && !sb.toString().contains(dataType)) {
+				// 如果所属类型在java.lang 包下 就不用用
+				sb.append("import ").append(dataType).append(";\n");
+			}
+		}
+		return sb.toString();
+	}
 }

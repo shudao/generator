@@ -1,22 +1,40 @@
-package com.shudao.generator.data;
+package com.shudao.generator.model;
 
-public class ColumnData {
+/***
+ * 数据列实体
+ * @author dali
+ *
+ */
+public class ColumnModel {
+	//easyui必填项选项
 	public static final String OPTION_REQUIRED = "required:true";
+	//easyui数字格式精度
 	public static final String OPTION_NUMBER_INSEX = "precision:2,groupSeparator:','";
+	//列名称
 	private String columnName;
+	//列数据类型
 	private String dataType;
+	//列数据类型简短
 	private String dataShortType;
+	//列注释
 	private String columnComment;
+	//TODO:
 	private String columnType;
+	//字符长度
 	private String charmaxLength = "";
+	//是否为空
 	private String nullable;
+	//TODO:
 	private String scale;
+	//精度
 	private String precision;
+	//TODO:
 	private String classType = "";
+	//TODO:
 	private String propertyName;
+	//TODO:
 	private String upperPropertyName;
-	
-	
+	//TODO:
 	private String optionType = "";
 
 	public String getColumnName() {
