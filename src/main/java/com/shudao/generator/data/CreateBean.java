@@ -15,8 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.shudao.generator.def.CodeResourceUtil;
-import com.shudao.generator.def.TableConvert;
+import com.shudao.generator.def.ResourceUtil;
 
 public class CreateBean {
 
@@ -72,7 +71,7 @@ public class CreateBean {
 				+ tableName
 				+ "' "
 				+ "and table_schema =  '"
-				+ CodeResourceUtil.DATABASE_NAME +"'";
+				+ ResourceUtil.getDatabaseName() +"'";
 
 		Connection con = getConnection();
 		PreparedStatement ps = con.prepareStatement(SQLColumns);

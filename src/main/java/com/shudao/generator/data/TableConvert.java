@@ -1,4 +1,4 @@
-package com.shudao.generator.def;
+package com.shudao.generator.data;
 
 public class TableConvert {
 	public static String getNullAble(String nullable) {
