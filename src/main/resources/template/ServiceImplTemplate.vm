@@ -1,0 +1,116 @@
+package ${packageName}.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+
+import ${packageName}.model.${className};
+import com.bankwel.ecf.common.model.Pager;
+import com.bankwel.ecf.common.service.BaseServiceImpl;
+import ${packageName}.service.${className}Service;
+import ${packageName}.mapper.${className}Mapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service("${lowerName}Service")
+public class ${className}ServiceImpl extends BaseServiceImpl<${className}> implements ${className}Service {
+	
+	@Autowired
+	private ${className}Mapper  ${lowerName}Mapper;
+	
+	/**
+ 	 * 
+     * @Description:新增${moduleName}
+     * @Author:${author}
+     * @Since:${createTime}
+     */
+	@Transactional(rollbackFor = Exception.class)
+	public int insertWithPK (${className} ${lowerName}){
+		return ${lowerName}Mapper.insertWithPK(${lowerName});
+	}
+	
+	/**
+ 	 * 
+     * @Description:删除${moduleName}
+     * @Author:${author}
+     * @Since:${createTime}
+     */
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteByPK (Integer id){
+		${lowerName}Mapper.deleteByPK(id);
+	}
+	
+	
+	/**
+ 	 * 
+     * @Description:批量删除${moduleName}
+     * @Author:${author}
+     * @Since:${createTime}
+     */
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteByPK (Integer[] ids){
+		for (Integer id : ids){
+			${lowerName}Mapper.deleteByPK(id);
+		}
+	}
+	
+	
+	/**
+ 	 * 
+     * @Description:修改${moduleName}
+     * @Author:${author}
+     * @Since:${createTime}
+     */
+	@Transactional(rollbackFor = Exception.class)
+	public int updateByPK (${className} ${lowerName}){
+		return ${lowerName}Mapper.updateByPK(${lowerName});
+	}
+	
+	
+	/**
+ 	 * 
+     * @Description:查找${moduleName}
+     * @Author:${author}
+     * @Since:${createTime}
+     */
+	public $className getModelByPK (Integer id){
+		return ${lowerName}Mapper.getModelByPK(id);
+	}
+	
+	/**
+	 * @Description:查找${moduleName}
+	 * @Author:${author}
+     * @Since:${createTime}
+	 * @param page
+	 * @param rows
+	 * @param params 
+	 * @return
+	 */
+	public Pager<${className}> getModelGrid (Integer page, Integer rows, Map<String, Object> params){
+		int fr=Pager.getFirstResult(page,rows);
+		params.put("firstResult", fr);
+		params.put("rows",rows);
+		List<${className}> list = ${lowerName}Mapper.getListByPage(params);
+		int total=getTotalCount4Page();
+		Pager<${className}> pager=new Pager<${className}>(total,page,rows);
+		pager.setList(list);
+		return pager;
+	
+	}
+	
+	
+	/**
+	 * @Description:查找${moduleName}
+	 * @Author:${author}
+     * @Since:${createTime}
+	 * @param params 
+	 * @return
+	 */
+	public List<${className}> getModelList(Map<String, Object> params){
+		List<${className}> list = ${lowerName}Mapper.getListByPage(params);
+		return list;
+	}
+
+}

@@ -1,0 +1,42 @@
+package ${packageName}.model;
+
+import java.io.Serializable;
+${importPackageName}
+import org.apache.ibatis.type.Alias;
+#foreach($column in $columnDatas)
+	#if($column.dataShortType == "Date")
+		import org.springframework.format.annotation.DateTimeFormat;
+	#break
+	#end
+#end
+
+
+/**
+ * 
+ *@Description:${moduleName}Model
+ *@Author:${author}
+ *@Since:${createTime}
+ */
+ 
+@Alias("${lowerName}")
+public class ${className} implements Serializable {
+
+#foreach($column in $columnDatas)
+
+	//${column.columnComment}
+#if($column.dataShortType == "Date")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+#end
+	private $column.dataShortType $column.propertyName;
+#end
+
+#foreach($column in $columnDatas)
+	public void set${column.upperPropertyName}($column.dataShortType ${column.propertyName}) {
+		this.${column.propertyName} = ${column.propertyName};
+	}
+	public $column.dataShortType get${column.upperPropertyName}() {
+		return this.${column.propertyName};
+	}
+#end
+}
+

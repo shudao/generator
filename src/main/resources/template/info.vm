@@ -1,0 +1,68 @@
+\#parse("include/constants.vm")
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加${moduleName}</title>
+	<link rel="stylesheet" type="text/css" href="$ctx/styles/easyui/default/easyui.css">
+	<link rel="stylesheet" href="$ctx/styles/easyui/icon.css" />
+	<link rel="stylesheet" href="$ctx/styles/main.css" />
+	<style type="text/css">
+		#detailTb{
+			border-collapse:separate;
+			border-spacing: 10px;
+		}
+		#detailTb th{
+			font-size:15px;
+		}
+		.fileBox{ position:relative;width:340px} 
+		.txt{ height:24px; border:1px solid #cdcdcd; width:180px;} 
+		.btn{ background-color:#FFF; border:1px solid #CDCDCD;height:24px; width:70px;} 
+		.file{ position:absolute; top:-9px; left:0px; height:28px; filter:alpha(opacity:0);opacity: 0;width:259px }
+    	.input,.textArea{
+    		width:200px;
+    	}
+    	.textArea{
+    		height:80px;
+    	}
+    </style>
+</head>
+<body class="easyui-layout" data-options="fit:true">
+	<div class="sky"></div>
+	<div data-options="region:'center'">
+		<form id="${lowerName}Form" >
+			<table id="detailTb">
+				#foreach($column in $columnDatas)
+				#if($column.propertyName == "id")
+						<tr>
+							<th>唯一标识：</th>
+							<td>
+								<input type="text" value="$!${lowerName}.id" readonly="true" />
+							</td>
+						</tr>
+				#else
+				<tr>
+					<th>$column.columnComment：</th>
+					<td>
+						<input type="text" name="$column.propertyName" class="$column.classType" #if($column.nullable == 'N') data-options="required:true" #end  #if($column.classType == "easyui-datetimebox")value="${jquery}!date.format('yyyy-MM-dd HH:mm:ss',${jquery}!${lowerName}.${column.propertyName})" #else value="${jquery}!${lowerName}.${column.propertyName}" #end readonly="true"/>
+					</td>
+				</tr>			
+			#end
+		#end
+			</table>
+        </form>
+	</div>
+    <div data-options="region:'south',border:false" style="height: 35px;text-align: center;vertical-align: middle;padding-top: 4px;">
+    	<a href="#" id="btn_ok" class="easyui-linkbutton" plain="true" iconCls="icon-ok" />确定 </a>
+    	<a href="#" id="btn_cancel" class="easyui-linkbutton" plain="true" iconCls="icon-cancel">取消</a>
+	</div>
+</body>
+<script type="text/javascript">
+var ctx = "$ctx";
+</script>
+<script type="text/javascript" src="$ctx/scripts/common/jquery.min.js"></script>
+<script type="text/javascript" src="$ctx/scripts/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="$ctx/scripts/lib/easyui/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="$ctx/scripts/common/util.js"></script>
+<script type="text/javascript" src="$ctx/scripts/common/constants.js"></script>
+<script type="text/javascript" src="$ctx/scripts/${lowerName}/info.js"></script>
+</html>

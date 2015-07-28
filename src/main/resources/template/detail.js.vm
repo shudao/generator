@@ -1,0 +1,75 @@
+$.ajaxSetup({
+	cache : false,
+	traditional : true
+});
+$(function(){
+	$PC.init();
+	$('.sky').hide();
+});
+var PageCtrl = $PC = function(){
+	
+	var me = null;
+
+	return{
+		/**
+		 * 页面初始化
+		 */
+		init:function(){
+			this.initVars();
+			this.renderUI();
+			this.bindUI();
+		},
+		/**
+		 * 变量初始化
+		 */
+		initVars:function(){
+			me = this;
+		},
+		/**
+		 * 渲染页面控件
+		 */
+		renderUI:function(){
+			
+		},
+		/**
+		 * 绑定事件和数据
+		 */
+		bindUI:function(){
+		    $('#btn_ok').click(function(e){
+		    	if(!isFormValid()){
+		    		return ;
+		    	}
+		    var data = $('#${lowerName}Form').serializeObject();
+			if(data.id)
+			{
+				url=ctx+'/${lowerName}/update.htm';
+			}
+			else
+			{
+				url=ctx+'/${lowerName}/add.htm';
+			}
+		    $.getJSON(url,data,function(result){
+				if(result.code==bk.ResultCode.DISABLE_OPERATE){
+					alert(result.message);
+					return;
+				}else if(result.code == bk.ResultCode.SERVER_ERR){
+		    		alert('服务器出错');
+		    		return;
+		    	}else if(result.code == bk.ResultCode.SUCCESS){
+		    		window.opener.reloadGrid();
+		    		$("#btn_cancel").trigger("click");
+		    	}
+		    	});
+		  	});
+		   
+		    $('#btn_cancel').click(function(e){
+		    	window.close();
+		    });
+		}
+	};
+}();
+
+
+function isFormValid(){
+	return $('#${lowerName}Form').form('validate');
+}

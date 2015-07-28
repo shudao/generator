@@ -1,0 +1,15 @@
+package ${packageName}.mapper;
+
+
+import ${packageName}.model.${className};
+import com.bankwel.ecf.admin.mapper.BaseMapper;
+
+/**
+ * 
+ * @Description:${moduleName}Mapper
+ * @Author:${author}
+ * @Since:${createTime}
+ */
+public interface ${className}Mapper extends BaseMapper<${className}>{
+	
+}

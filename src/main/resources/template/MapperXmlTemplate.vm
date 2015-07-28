@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${packageName}.mapper.${className}Mapper">
+	<resultMap type="${lowerName}" id="${lowerName}Map">
+#foreach($column in $columnDatas)
+#if($column.columnName == "id")
+		<id column="id" property="id"/>
+#else
+		<result column="$column.columnName" property="$column.propertyName"/>   
+#end
+#end
+	</resultMap>
+
+
+	<sql id="${lowerName}_field_list_alias">
+#foreach($column in $columnDatas)
+#if($velocityCount > 1)
+		,a.$column.columnName
+#else
+		a.$column.columnName
+#end	 
+#end 	
+#foreach($column in $fkColumnDatas)
+		,a.$column.columnName
+#end
+	</sql>
+
+	<insert id="insertWithPK" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into $tableName 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach($column in $columnDatas)
+#if($column.propertyName == "id")
+			<if test="id != null">$column.columnName,</if>#else
+			<if test="$column.propertyName != null">$column.columnName,</if>
+#end
+#end
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach($column in $columnDatas)
+#if($column.propertyName == "id")
+			<if test="id != null">#{$column.propertyName},</if>
+#else
+			<if test="$column.propertyName != null">#{$column.propertyName},</if>
+#end
+#end
+		</trim>
+	</insert>
+
+	<delete id="deleteByPK">
+		delete from $tableName where id=#{id};
+	</delete>
+	
+	<update id="updateByPK">
+		update $tableName
+		<set>
+#foreach($column in $columnDatas)
+#if($column.propertyName != "id")
+			<if test="$column.propertyName != null">$column.columnName=#{$column.propertyName},</if>
+#end
+#end
+		</set>
+		where id = #{id};
+	</update>
+	
+	
+	
+	<select id="getModelByPK" resultMap="${lowerName}Map">
+		select <include refid="${lowerName}_field_list_alias"/> 
+		from 
+			$tableName a
+		where 
+			a.id=#{id};
+	</select>
+
+	<select id="getListByPage" resultMap="${lowerName}Map">
+		select SQL_CALC_FOUND_ROWS
+		<include refid="${lowerName}_field_list_alias"/>
+		from 
+			$tableName a
+		<where>
+#foreach($column in $columnDatas)
+#if($column.columnName == "id")
+			<if test="id != null">
+				a.id = #{id}
+			</if>
+#else
+			<if test="$column.propertyName != null and $column.propertyName != ''">
+				and a.$column.columnName like concat('%',#{$column.propertyName},'%')
+			</if>
+#end
+#end
+		</where>
+		<if test="firstResult != null and rows != null">
+				limit #{firstResult},#{rows}
+		</if>
+	</select>
+	
+</mapper>

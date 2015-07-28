@@ -1,0 +1,65 @@
+package ${packageName}.service;
+
+import java.util.List;
+import java.util.Map;
+
+import ${packageName}.model.${className};
+import com.bankwel.ecf.common.model.Pager;
+
+/**
+ * 
+ * @Description:${moduleName}Service
+ * @Author:${author}
+ * @Since:${createTime}
+ */
+public interface ${className}Service {
+	
+	/**
+	 * 新增
+	 * @param ${lowerName}
+	 */
+	int insertWithPK (${className} ${lowerName});
+	
+	/**
+	 * 删除
+	 * @param id
+	 */
+	void deleteByPK (Integer id);
+	
+	/**
+	 * 批量删除
+	 * @param id
+	 */
+	void deleteByPK (Integer[] id);
+	
+	
+	/**
+	 * 修改
+	 * @param ${lowerName}
+	 */
+	int updateByPK (${className} ${lowerName});
+	
+	/**
+	 * 查找
+	 * @param id
+	 * @return
+	 */
+	$className getModelByPK (Integer id);
+	
+	/**
+	 * 查找
+	 * @param params
+	 * @return
+	 */
+	List<${className}> getModelList(Map<String, Object> params);
+	
+	/**
+	 * 分页
+	 * @param page
+	 * @param rows
+	 * @param params 
+	 * @return
+	 */
+	Pager<${className}> getModelGrid(Integer page, Integer rows, Map<String, Object> params);
+
+}

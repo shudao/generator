@@ -1,0 +1,218 @@
+$.ajaxSetup({
+	cache : false,
+	traditional : true
+});
+$(function(){
+	$PC.init();
+	$('.sky').hide();
+});
+var PageCtrl = $PC = function(){
+	
+	var me = null, $CL = null;
+	
+	var _tools = [{
+		id:'addRow',
+		text:'添加',
+		iconCls:'icon-add',
+		handler:function(){
+			bk.openWin(ctx + '/${lowerName}/detail.htm?id=', 600,450,'查看${moduleName}',true);
+		}
+	},'-',{
+		id:'updateRow',
+		text:'修改',
+		iconCls:'icon-edit',
+		handler:function(){
+			var row = $CL.datagrid('getSelected');
+			if(!row){
+				alert('请选中要修改的${moduleName}！');
+				return;
+			}
+			bk.openWin(ctx + '/${lowerName}/detail.htm?id='+row.id,600,450,'查看{moduleName}',true);
+		}
+	},'-',{
+		id:'mutiDeleteRow',
+		text:'批量删除',
+		iconCls:'icon-remove',
+		handler:function(){
+			var ids = [];
+			var names = [];
+			var checkedboxes= $CL.datagrid('getChecked');
+			$.each(checkedboxes,function(i,e){
+				ids.push(e.id);
+				var tempRowName = "";
+				for(var key in e){
+					if(key != "id"){
+						tempRowName = e[key];
+						break;
+					}
+				}
+				names.push(tempRowName);
+			});
+			if(ids.length < 1){
+				alert('请勾选要删除的${moduleName}！');
+				return;
+			}
+			deleteAll(ids,names);
+		}
+	},'-',{
+		id:'deleteRow',
+		text:'删除',
+		iconCls:'icon-remove',
+		handler:function(){
+			var row = $CL.datagrid('getSelected');
+			if(!row){
+				alert('请选择要删除的${moduleName}！');
+				return;
+			}
+			var tempRowName = "";
+			for(var key in row){
+				if(key != "id"){
+					tempRowName = row[key];
+					break;
+				}
+			}
+			deleteAll(row.id,tempRowName);
+		}
+	},'-',{
+		id:'viewRow',
+		text:'查看',
+		iconCls:'icon-look',
+		handler:function(){
+			var row = $CL.datagrid('getSelected');
+			if(!row){
+				alert('请选中要查看的${moduleName}！');
+				return;
+			}
+			bk.openWin(ctx + '/${lowerName}/info.htm?id='+row.id,600,450,'查看{moduleName}',true);
+		}
+	}];
+	
+	return{
+		/**
+		 * 页面初始化
+		 */
+		init:function(){
+			this.initVars();
+			this.renderUI();
+			this.bindUI();
+		},
+		/**
+		 * 变量初始化
+		 */
+		initVars:function(){
+			me = this;
+			$CL = $('#${lowerName}_grid');
+		},
+		/**
+		 * 渲染页面控件
+		 */
+		renderUI:function(){
+			${jquery}CL.datagrid({
+    			url:ctx + '/${lowerName}/list.htm',
+   				queryParams: {
+        		},
+    			fit: true,
+			    fitColumns: true,
+			    striped: true,
+			    rownumbers: true,
+			    singleSelect: true,
+			    checkOnSelect: false,
+			    selectOnCheck: false,
+			    nowrap: false,
+			    idField: 'id',
+			    pagination: true,
+			    pageSize: 25,
+			    pageList: [25, 30, 50],
+			    columns:[[
+					{field:'id', checkbox:true}
+#foreach($column in $columnDatas)
+#if($column.propertyName != "id")
+					,{field:'${column.propertyName}', title:'${column.columnComment}',width:40}
+#end
+#end
+				]],
+			    toolbar: _tools,
+			    onClickRow: function(rowIndex, rowData) {
+			        curRow = rowData;
+			        lastIndex = rowIndex;
+			    },
+			    onRowContextMenu: function(e, rowIndex, rowData) {
+			        e.preventDefault();
+			        ${jquery}CL.datagrid('selectRow', rowIndex);
+					${jquery}CL.datagrid('options').onClickRow(rowIndex,rowData);
+			        $('#right_menu').menu('show', {
+			            left: e.pageX,
+			            top: e.pageY
+			        });
+			    },
+			    onDblClickRow: function(rowIndex, rowData) {
+			        $("#updateRow").trigger("click");
+			    },
+			});
+		},
+		/**
+		 * 绑定事件和数据
+		 */
+		bindUI:function(){
+			//查询
+			$('#searchBtn').click(function(e){
+				var data = $('#searchForm').serializeObject();
+				data.state = 1;
+				$CL.datagrid('load',data);
+			});
+			//清空查询值
+			$('#clearBtn').click(function(e){
+				$('#searchForm').form('clear');
+			});
+			//表格右键
+			$('#right_menu').menu({
+				onClick:function(item){
+					me[item.id]();
+				}
+			});
+	
+		},
+		addItem:function(){
+			$('#addRow').trigger('click');
+		},
+		updateItem:function(){
+			$('#updateRow').trigger('click');
+		},
+		mutiDelete:function(){
+			$('#mutiDeleteRow').trigger('click');
+		},
+		singleDelete:function(){
+			$('#deleteRow').trigger('click');
+		},
+		viewItem:function(){
+			$('#viewRow').trigger('click');
+		}
+	};
+}();
+
+function reloadGrid(){
+	$('#${lowerName}_grid').datagrid("clearChecked");
+	$('#${lowerName}_grid').datagrid("clearSelections");
+	$('#${lowerName}_grid').datagrid('reload');
+}
+
+
+function deleteAll(ids,names){
+	confirm('确定删除['+names+']吗？',{
+		onOK:function(){
+			$.getJSON(ctx + '/${lowerName}/delete.htm',{ids:ids},function(result){
+				if(result.code == bk.ResultCode.SERVER_ERR){
+					alert('删除出错！');
+					return;
+				}else{
+					if(result.code ==bk.ResultCode.DISABLE_OPERATE){
+						alert(result.message || '您没有此操作的权限，请联系管理员！');
+						return;
+					}
+				}
+				reloadGrid();
+			});
+		}
+	});		
+}
+

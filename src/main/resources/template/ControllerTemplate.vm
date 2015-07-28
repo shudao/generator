@@ -1,0 +1,183 @@
+package ${packageName}.web;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import ${packageName}.model.${className};
+import ${packageName}.service.${className}Service;
+import com.bankwel.ecf.common.model.Pager;
+import com.bankwel.ecf.common.model.ResultInfo;
+import com.bankwel.ecf.common.util.LoggerUtils;
+
+/**
+ * 
+ * @Description:${moduleName}控制器
+ * @Author:${author}
+ * @Since:${createTime}
+ */
+@Controller
+@RequestMapping("${lowerName}")
+public class ${className}Controller {
+	@Autowired
+	private ${className}Service ${lowerName}Service;
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${createTime}
+	 * @return
+	 */
+	@RequestMapping(value = "/index")
+	public String gridIndex(){
+		return "${lowerName}/index";
+	}
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${createTime}
+	 * @return
+	 */
+	@RequestMapping(value = "/list")
+	public @ResponseBody
+	Map<String, Object> retrieve${className}Grid(#foreach($column in $columnDatas)String $column.propertyName, #end Integer page, Integer rows){
+		Map<String, Object> data = new HashMap<>();
+		try {
+			Map<String, Object> params = new HashMap<String,Object>();
+#foreach($column in $columnDatas)
+			params.put("$column.propertyName",$column.propertyName);
+#end
+			Pager<${className}> pager = ${lowerName}Service.getModelGrid(page,rows,params);
+			data.put("total", pager.getTotal());
+			data.put("rows", pager.getList());
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+		}
+		return data;
+	}
+
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${creatTime}
+	 * @param id
+	 * @param mm
+	 * @return
+	 */
+	@RequestMapping(value = "/detail")
+	public String ${lowerName}Detail(@RequestParam(required = false) Integer id, ModelMap mm){
+		${className} ${lowerName} = null;
+		try {
+			if(id != null)
+			{
+				${lowerName} = ${lowerName}Service.getModelByPK(id);
+			}
+			mm.addAttribute("${lowerName}", ${lowerName});
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+		}
+		return "${lowerName}/detail";
+	}
+	
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${creatTime} 
+	 * @param:${lowerName}
+	 * @return
+	 */
+	@RequestMapping(value = "/add")
+	public @ResponseBody
+	ResultInfo add${className}(${className} ${lowerName}){
+		ResultInfo resultInfo = new ResultInfo(-1);
+		try {
+			${lowerName}Service.insertWithPK(${lowerName});
+			resultInfo.setCode(0);
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+			resultInfo.setMessage(e.getMessage());
+		}
+		return resultInfo;
+	}
+	
+		
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${creatTime} 
+	 * @param:${lowerName}
+	 * @return
+	 */
+	@RequestMapping(value = "/update")
+	public @ResponseBody
+	ResultInfo update${className}(${className} ${lowerName}){
+		ResultInfo resultInfo = new ResultInfo(-1);
+		try {
+			${lowerName}Service.updateByPK(${lowerName});
+			resultInfo.setCode(0);
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+			resultInfo.setMessage(e.getMessage());
+		}
+		return resultInfo;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${createTime}
+	 * @param ids
+	 * @return
+	 */
+	@RequestMapping(value = "/delete")
+	public @ResponseBody
+	ResultInfo delete${className}(@RequestParam Integer[] ids){
+		ResultInfo resultInfo = new ResultInfo(-1);
+		try {
+			${lowerName}Service.deleteByPK(ids);
+			resultInfo.setCode(0);
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+		}
+		return resultInfo;
+	}
+	
+	/**
+	 * 
+	 * @Description:
+	 * @Author:${author}
+	 * @Since:${creatTime}
+	 * @param id
+	 * @param mm
+	 * @return
+	 */
+	@RequestMapping(value = "/info")
+	public String ${lowerName}View(@RequestParam Integer id, ModelMap mm){
+		${className} ${lowerName} = null;
+		try {
+			${lowerName} = ${lowerName}Service.getModelByPK(id);
+			mm.addAttribute("${lowerName}", ${lowerName});
+		} catch (Exception e) {
+			LoggerUtils.error(e);
+		}
+		return "${lowerName}/info";
+	}
+	
+}
