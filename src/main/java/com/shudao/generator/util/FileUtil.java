@@ -62,8 +62,7 @@ public class FileUtil {
 	 */
 	private static String delDotVmSuffix(String templateName,String className) {
 		String full = templateName.substring(0, templateName.length() - 3);
-		String suffix = full.substring(full.indexOf("."),full.length());
-		String outputName = className + suffix;
+		String outputName = className + full;
 		return outputName;
 	}
 	/**
